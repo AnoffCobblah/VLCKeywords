@@ -15,6 +15,10 @@ knitr::opts_chunk$set(echo = TRUE)
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
 *********************************************************************************************************************************************
+# Instructions for Use
+Recreational Reckoning has a variety of tools available. Now that you know what your experimental question is, you should look through the tools below to find the ones which will help you answer it. To produce a summary of what Recreational Reckoning has to offer, use the "Knit" button above in the R Studio console. This will create an html document with a table of contents. Look through this table and create your own strategy for using these tools. To see examples of possible applications of these tools, see repositories labelled "RR" in the github repositories of AnoffCobblah (https://github.com/AnoffCobblah).
+
+
 ## Preparation
 
 ### Experimental Question
@@ -124,57 +128,8 @@ citation("tokenizers")
 
 # Pre-processing Text(s): Turning Raw Texts into Workable Data
 
-## Parameters for Pre-Processing Texts
-The first step in textual analysis is to transform the text into a workable format. In its current iteration, my methodology works with locally stored pdf or txt files only. If you are working with locally stored data, the first thing to do is to move all your raw data into a folder within your working directory titled "data" (lower-case). Your corpus can be one pdf, or thousands of txt files; it doesn't matter as long as they are in the same location. If you want to store your data in a different folder for some reason, change the file path below. 
-
+For this project, I have the VLC essays as txt files already, so we just need to upload them.
 ```{r RawDataLocation, eval=FALSE}
-RawDataLocation <- paste0(getwd(),"/","data") 
+ProcessedDataLocation <- paste0(getwd(),"/","data") 
 ```
  
-In order to turn the locally stored pdf and txt files into a format that can be analyzed, the "Pre-Processing Texts" steps below creates a new folder, which will actually be where the texts that are being analyzed are stored.  The default is to create a folder called "Processed-Texts-[Current Date]" in the working directory.  But if you want to store them somewhere else, edit the file path below.
-
-```{r ProcessedDataLocation, eval=FALSE}
-ProcessedDataLocation <- paste0(getwd(),"/","Processed-Texts","-",format(Sys.Date()))
-```
-
-##Pre-processing PDFs
-
-Many historical documents are stored as pdfs, which can be inconvenient in many ways.  Pdfs are often full of error-producing metadata, and further errors can be produced by poor *Optical Character Recognition*.  So the first thing we are going to do is turn the pdf files in our raw data set into txt files.  These files will be stored in the newly created folder, Processed-Texts-[Current Date]", if it does not already exist.  
-
-```{r PDF Script, eval=FALSE}
-
-  if(file.exists(ProcessedDataLocation) == FALSE) {dir.create(ProcessedDataLocation)}
-  files <- list.files(path = RawDataLocation, pattern = "pdf$", full.names = TRUE) #creates vector of pdf file names in your working directory.
-  Rpdf <- readPDF(control = list(text = "-layout"))
-  PDFdatacorpus <- Corpus(URISource(files), readerControl = list(reader = Rpdf))
-  writeCorpus(PDFdatacorpus, path = ProcessedDataLocation)
-  PDFtxtfiles <- list.files(path = ProcessedDataLocation, pattern = "txt", full.names = TRUE)
-  sapply(PDFtxtfiles,FUN=function(eachPath){
-    file.rename(from=eachPath,to=sub(pattern=".pdf",replacement="",eachPath))
-  })
-
-```
-
-## Pre-processing Txts
-
-If your texts are already in txt format, you do not need to change their format. So this makes sure these texts can be read into R, and then moves the texts from RawDataLocation to the same location the pdfs went to. Again, these files will be stored in a newly created folder, "Processed-Texts-[Current Date]", if it does not already exist.  
-
-```{r TXT Script, eval=FALSE}
-
-  if(file.exists(ProcessedDataLocation) == FALSE) {dir.create(ProcessedDataLocation)}
-  files <- list.files(path = RawDataLocation, pattern = "txt$", full.names = TRUE) #creates vector of txt file names in your working directory.
-  TXTdatacorpus <- Corpus(URISource(files), readerControl=list(reader = readPlain))
-  writeCorpus(TXTdatacorpus, path = ProcessedDataLocation)
-  TXTtxtfiles <- list.files(path = ProcessedDataLocation, pattern = "txt", full.names = TRUE)
-  sapply(TXTtxtfiles,FUN=function(eachPath){
-    file.rename(from=eachPath,to=sub(pattern=".txt.txt",replacement=".txt",eachPath))
-  })
-
-```
-
-*********************************************************************************************************************************************
-*********************************************************************************************************************************************
-*********************************************************************************************************************************************
-
-# Instructions for Use
-Recreational Reckoning has a variety of tools available. Now that you know what your experimental question is, you should look through the tools below to find the ones which will help you answer it. To produce a summary of what Recreational Reckoning has to offer, use the "Knit" button above in the R Studio console. This will create an html document with a table of contents. Look through this table and create your own strategy for using these tools. To see examples of possible applications of these tools, see repositories labelled "RR" in the github repositories of AnoffCobblah (https://github.com/AnoffCobblah).
