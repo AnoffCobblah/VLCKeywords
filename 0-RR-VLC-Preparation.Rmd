@@ -130,6 +130,6 @@ citation("tokenizers")
 
 For this project, I have the VLC essays as txt files already, so we just need to upload them.
 ```{r RawDataLocation, eval=FALSE}
-ProcessedDataLocation <- paste0(getwd(),"/","data") 
+ProcessedDataLocation <- paste0(getwd(),"/","VLC-data") 
 ```
  

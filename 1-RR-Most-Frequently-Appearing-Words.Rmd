@@ -1,0 +1,46 @@
+---
+title: "1-RR-Most-Frequently-Appearing-Words"
+author: "Anoff Nicholas Cobblah"
+date: "July 30, 2018"
+output: html_document
+    number_sections: yes
+    toc: true
+    toc_depth: 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*********************************************************************************************************************************************
+*********************************************************************************************************************************************
+*********************************************************************************************************************************************
+# Most Frequently Appearing Words
+This is a simple way of determining which words in your corpus appear most frequently, using the tm package to create a term document matrix.  The variable "lowfreq" determines the lower limit.  Here, we are throwing out any terms which appear less than 10 times.  But this variable can be changed as needed.
+
+
+``` {r Most Frequent Terms, eval=FALSE}
+files <- list.files(path = ProcessedDataLocation, pattern = "txt", full.names = TRUE) #creates vector of txt file names.
+  datacorpus <- VCorpus(URISource(files, encoding = "UTF-8", mode = "text"))
+  
+  #Since these files were accessed though the University of Michigan, almost every file includes some varient on this: "Downloaded from https://www.cambridge.org/core. Univ of Michigan Law Library, on 25 Sep 2018 at 20:39:04, subject to the Cambridge Core terms of use, available at https://www.cambridge.org/core/terms. https://doi.org/10.1017/S1060150318000232." We could edit this out by finding and replacing the term in all these files, but it's easier to just add the most important words in this list to the stoplist of ignored words for the corpus, since none of them seem likely to be important keywords in this corpus.
+  datacorpus <- tm_map(datacorpus, removeWords, c(stopwords("en"),"Downloaded", "www","Cambridge","cambridge","Core","core","Univ", "Michigan", "Law Library","subject", "terms of use","available", "https://www.cambridge.org/core/terms","https","doi","org","Sep"))
+    
+  #"Press" and "University" area also going to give several false positives, as these terms frequently appear in the bibliographies but are not keywords. So we cut them as well. Note that removing these capitalized terms will only remove capitalized references, leaving lower-case references which are less likely to appear in bibliographies.
+  datacorpus <- tm_map(datacorpus, removeWords, c("Press","University"))
+  
+  #Now we have to start making hard choices. "Oxford" appears 47 times in this corpus, but most of those are referencing bibliographic materials from Oxford University Press. So it must go. The same holds true of "New York", "Chicago", and "London". 
+  datacorpus <- tm_map(datacorpus, removeWords, c("Oxford", "New York","Chicago","London"))
+
+    #We're now ready to create our corpus.
+  data.tdm <- TermDocumentMatrix(datacorpus,control = list(removePunctuation = TRUE, stopwords = TRUE, tolower = TRUE, stemming = TRUE, 
+                                                           removeNumbers = TRUE, bounds = list(global= c(1,Inf))))
+  ft <- findFreqTerms(data.tdm, lowfreq = 10, highfreq = Inf)
+  ft.tdm <- inspect(data.tdm[ft,])
+  print("Frequency summary below:")
+  print(apply(ft.tdm, 1, sum))
+```
+
+As you can see, the summary is not too surprising. The most frequently used terms are those one would associate with the study of Victorian Literature and Culture. They have been stemmed to more easily seek them out, but they're all there: culture, histori, literatur, read, studi, Victorian. "one" and "see" are not key words. Work is likely a reference to sources rather than to the idea of work.
+
+But there is one very interesting standout: form. Based purely on frequency, form would seem to be the idea central to Victorian studies right now.
